@@ -1,0 +1,45 @@
+!!!
+html
+	head
+		title Expose
+		script(type='text/javascript', src='/cdn/json2.js')
+		script(type='text/javascript', src='/cdn/jquery-min.js')
+		script(type='text/javascript', src='/cdn/underscore-min.js')
+		script(type='text/javascript', src='/cdn/backbone-min.js')
+		script(type='text/javascript', src='expose.js')
+		link(rel='stylesheet', type='text/css', media='all', href='style.css')
+	body
+		div#expose-list-view
+		div#expose-edit-view
+
+		script(type='text/template', id='item-template')
+			| <% if (_id) { %>
+			| 	<div><%= _id %></div>
+			| 	{{LIST_TEMPLATE}}
+			| 	<div><a href='#documents/<%= _id%>/edit'>edit</a></div>
+			| <% } %>
+
+		script(type='text/template', id='edit-template')
+			| <% if (_id) { %>
+			| 	<div><%= _id %></div>
+			| 	{{EDIT_TEMPLATE}}
+			| 	<input type='button' class='save' value='save'></input>
+			| <% } %>
+
+		script(type='text/template', id='paginate-template')
+			| <% if(pages > 1) { %>
+			| 	<% if(prev) { %>
+			| 		<a href="#" class="prev">&laquo;</a>
+			| 	<% } else { %>
+			| 		<span>&laquo;</span>
+			| 	<% } %>
+			| 
+			| <%= range[0] %>..<%= range[1] %> of <%= total %>
+			| 
+			| 	<% if(next) { %>
+			| 		<a href="#" class="next">&raquo;</a>
+			| 	<% } else { %>
+			| 		<span>&raquo;</span>
+			| 	<% } %>
+			| <% } %>
+

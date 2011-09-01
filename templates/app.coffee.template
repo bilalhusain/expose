@@ -1,0 +1,31 @@
+db = require './db/schema'
+express = require 'express'
+
+app = express.createServer()
+
+app.configure () ->
+	app.use express.static __dirname + '/static'
+	app.use express.bodyParser()
+
+app.get '/documents', (req, res) ->
+	page = +req.query.page or 1
+	per_page = 5
+	db.{{COLLECTION}}.count {}, (err, total) ->
+		db.{{COLLECTION}}.find {}, ['_id'{{LIST_TEMPLATE}}], {skip: per_page * (page - 1), limit: per_page}, (err, documents) ->
+			res.send JSON.stringify {page: page, per_page: per_page, total: total, documents: documents}
+
+app.get '/documents/:id/edit', (req, res) ->
+	id = req.params.id
+	db.{{COLLECTION}}.findOne {_id: id}, ['_id'{{EDIT_TEMPLATE}}], (err, document) ->
+		res.send JSON.stringify document
+
+app.post '/documents/:id/edit', (req, res) ->
+	console.log req.body
+	res.send 'ok'
+
+app.all '*', (req, res) ->
+	console.log req.headers
+	res.send 'nope, not in a mood to serve'
+
+app.listen(2014)
+

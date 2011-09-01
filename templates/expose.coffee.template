@@ -1,0 +1,144 @@
+$ () ->
+	Backbone.emulateHTTP = true
+	
+	Expose =
+		Models: {}
+		Views: {}
+		Collections: {}
+		Routers: {}
+		init: () ->
+			new Expose.Routers.Main()
+			Backbone.history.start()
+	
+	# Edit
+	
+	Expose.Models.Edit = Backbone.Model.extend
+		url: () -> '/expose/documents/' + this.get('_id') + '/edit'
+	
+	Expose.Views.Edit = Backbone.View.extend
+		el: '#expose-edit-view'
+		tagName: 'div'
+		className: 'expose-edit'
+		template: _.template($('#edit-template').html())
+	
+		initialize: () ->
+			_.bindAll this, 'render'
+			this.model.bind 'change', this.render
+	
+		events:
+			'click .save': 'syncDocument'
+	
+		syncDocument: () ->
+			this.model.save {{EDIT_TEMPLATE}}
+	
+		render: () ->
+			$(this.el).html(this.template(this.model.toJSON()))
+	
+	
+	# List
+	
+	Expose.Models.Document = Backbone.Model.extend {}
+	
+	Expose.Collections.Documents = Backbone.Collection.extend
+		model: Expose.Models.Document
+		url: () -> '/expose/documents?' + $.param {page: this.page}
+	
+		initialize: () ->
+			this.page = 1
+	
+		parse: (response) ->
+			this.page = response.page
+			this.perPage = response.per_page
+			this.total = response.total
+			this.data = response.documents
+			return this.data
+	
+		pageInfo: () ->
+			info =
+				total: this.total
+				page: this.page
+				perPage: this.perPage
+				pages: Math.ceil(this.total / this.perPage)
+				prev: false
+				next: false
+	
+			max = Math.min(this.total, this.page * this.perPage)
+			max = this.total if this.total is (this.pages * this.perPage)
+	
+			info.range = [(this.page - 1) * this.perPage + 1, max]
+	
+			info.prev = this.page - 1 if this.page > 1
+			info.next = this.page + 1 if this.page < info.pages
+	
+			info
+	
+		nextPage: () ->
+			this.page = this.page + 1
+			this.fetch()
+	
+		previousPage: () ->
+			this.page = this.page - 1
+			this.fetch()
+	
+	Expose.Views.DocumentItem = Backbone.View.extend
+		model: Expose.Models.Document
+		tagName: 'div'
+		className: 'document-item'
+		template: _.template($('#item-template').html())
+	
+		initialize: () ->
+			this.model.view = this
+	
+		render: () ->
+			$(this.el).html(this.template(this.model.toJSON()))
+			this
+	
+	Expose.Views.DocumentsList = Backbone.View.extend
+		el: '#expose-list-view'
+		template: _.template($('#paginate-template').html())
+	
+		initialize: () ->
+			_.bindAll(this, 'render')
+			this.collection.bind('reset', this.render)
+	
+		events:
+			'click a.prev': 'previous'
+			'click a.next': 'next'
+	
+		render: () ->
+			$(this.el).empty()
+			$(this.el).append $('<div />').addClass('document-navigation').html(this.template(this.collection.pageInfo()))
+	
+			self = this
+			this.collection.each (document) ->
+				view = new Expose.Views.DocumentItem {model: document}
+				$(self.el).append(view.render().el)
+	
+			this # enables chained calls
+	
+		previous: () ->
+			this.collection.previousPage()
+			false # no default action for event
+	
+		next : () ->
+			this.collection.nextPage()
+			false # no default action for event
+	
+	Expose.Routers.Main = Backbone.Router.extend
+		routes:
+			'': 'index'
+			'documents/:id/edit': 'edit'
+	
+		index: () ->
+			documents = new Expose.Collections.Documents()
+			new Expose.Views.DocumentsList {collection: documents}
+			documents.fetch()
+	
+		edit: (id) ->
+			document = new Expose.Models.Edit {_id: id}
+			new Expose.Views.Edit {model: document}
+			document.fetch()
+	
+	
+	Expose.init()
+

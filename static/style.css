@@ -1,0 +1,43 @@
+input, textarea {
+	display: block;
+}
+#expose-list-view {
+	background-color: #F0F6F8;
+	padding: 5px;
+	margin-bottom: 20px;
+}
+
+#expose-edit-view {
+	background-color: #FFF0F0;
+	margin: 10px;
+}
+
+.document-item {
+	clear: both;
+}
+.document-item > div:first-child {
+	float: left;
+}
+
+.document-item:nth-child(odd) {
+	background-color: #F0F0F0;
+}
+.document-item:nth-child(even) {
+	background-color: #F7F7F7;
+}
+
+.document-item > div {
+	display: inline-block;
+	font-family: Arial;
+	font-size: 12px;
+	width: 200px;
+}
+
+
+.document-item > div {
+	display: inline-block;
+	font-family: Arial;
+	font-size: 12px;
+	width: 200px;
+}
+
