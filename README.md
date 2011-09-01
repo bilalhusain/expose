@@ -10,6 +10,7 @@ Assumptions
 
 
 Running
+
 * define settings in exposeConfig.coffee
 * update schema in db/schema.coffee
 * ./build.sh
