@@ -8,3 +8,9 @@ Assumptions
 * application runs at port 2014, and corresponds to location /expose for the reverse proxy
 * the list view is paginated with 5 documents per page
 
+
+Running
+* define settings in exposeConfig.coffee
+* update schema in db/schema.coffee
+* ./build.sh
+
